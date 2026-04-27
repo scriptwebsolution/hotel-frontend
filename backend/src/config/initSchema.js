@@ -5,7 +5,9 @@ const STATEMENTS = [
     id CHAR(36) NOT NULL PRIMARY KEY,
     name VARCHAR(120) NOT NULL,
     email VARCHAR(160) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NULL,
+    google_id VARCHAR(64) NULL UNIQUE,
+    avatar_url VARCHAR(512) NULL,
     role ENUM('guest', 'staff', 'admin') NOT NULL DEFAULT 'guest',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -46,10 +48,37 @@ const STATEMENTS = [
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 ];
 
+const columnExists = async (table, column) => {
+  const [rows] = await pool.query(
+    `SELECT COUNT(*) AS c FROM information_schema.columns
+     WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?`,
+    [table, column]
+  );
+  return rows[0].c > 0;
+};
+
+const ensureUsersAuthColumns = async () => {
+  if (!(await columnExists("users", "google_id"))) {
+    await pool.query(
+      "ALTER TABLE users ADD COLUMN google_id VARCHAR(64) NULL UNIQUE"
+    );
+  }
+  if (!(await columnExists("users", "avatar_url"))) {
+    await pool.query(
+      "ALTER TABLE users ADD COLUMN avatar_url VARCHAR(512) NULL"
+    );
+  }
+
+  await pool.query(
+    "ALTER TABLE users MODIFY COLUMN password_hash VARCHAR(255) NULL"
+  );
+};
+
 const initSchema = async () => {
   for (const sql of STATEMENTS) {
     await pool.query(sql);
   }
+  await ensureUsersAuthColumns();
 };
 
 if (require.main === module) {

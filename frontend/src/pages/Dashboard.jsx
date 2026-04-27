@@ -1,6 +1,8 @@
+﻿import { useEffect, useMemo, useState } from "react";
 import StatCard from "../components/StatCard.jsx";
 import RoomCard from "../components/RoomCard.jsx";
-import { bookings, rooms, stats } from "../utils/mockData.js";
+import { bookings, rooms as mockRooms, stats } from "../utils/mockData.js";
+import { fetchRooms } from "../services/roomService.js";
 
 const statusStyles = {
   Confirmed: "bg-brand-50 text-brand-700",
@@ -73,8 +75,36 @@ const iconRevenue = (
 );
 
 export default function Dashboard() {
-  const featuredRooms = rooms.slice(0, 3);
+  const [liveRooms, setLiveRooms] = useState(mockRooms);
+  const [loadingRooms, setLoadingRooms] = useState(true);
+  const [roomsError, setRoomsError] = useState("");
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoadingRooms(true);
+        setRoomsError("");
+        const data = await fetchRooms();
+        setLiveRooms(data);
+      } catch (err) {
+        setRoomsError(err.message || "Unable to reach backend.");
+      } finally {
+        setLoadingRooms(false);
+      }
+    };
+
+    load();
+  }, []);
+
+  const featuredRooms = liveRooms.slice(0, 3);
   const recentBookings = bookings.slice(0, 4);
+  const liveStats = useMemo(
+    () => ({
+      ...stats,
+      totalRooms: liveRooms.length,
+    }),
+    [liveRooms]
+  );
 
   return (
     <div className="space-y-8">
@@ -94,33 +124,39 @@ export default function Dashboard() {
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Total bookings"
-          value={stats.totalBookings}
+          value={liveStats.totalBookings}
           delta="12.4%"
           trend="up"
           icon={iconBookings}
         />
         <StatCard
           label="Total rooms"
-          value={stats.totalRooms}
+          value={liveStats.totalRooms}
           delta="2 new"
           trend="up"
           icon={iconRooms}
         />
         <StatCard
           label="Occupancy"
-          value={stats.occupancy}
+          value={liveStats.occupancy}
           delta="3.1%"
           trend="up"
           icon={iconOccupancy}
         />
         <StatCard
           label="Revenue"
-          value={stats.revenue}
+          value={liveStats.revenue}
           delta="5.8%"
           trend="up"
           icon={iconRevenue}
         />
       </section>
+
+      {roomsError && (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Backend room API not reachable. Showing fallback demo data.
+        </section>
+      )}
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="card p-6 xl:col-span-2">
@@ -214,9 +250,13 @@ export default function Dashboard() {
         </div>
 
         <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {featuredRooms.map((room) => (
-            <RoomCard key={room.id} room={room} />
-          ))}
+          {loadingRooms ? (
+            <div className="card col-span-full p-6 text-sm text-ink-500">
+              Loading rooms from backend...
+            </div>
+          ) : (
+            featuredRooms.map((room) => <RoomCard key={room.id} room={room} />)
+          )}
         </div>
       </section>
     </div>

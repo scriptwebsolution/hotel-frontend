@@ -19,7 +19,7 @@ export default function Logo({ collapsed = false }) {
       </div>
       {!collapsed && (
         <div className="leading-tight">
-          <p className="text-sm font-semibold text-ink-900">Stayly</p>
+          <p className="text-sm font-semibold text-ink-900">Axiora</p>
           <p className="text-[11px] text-ink-500">Hotel Management</p>
         </div>
       )}

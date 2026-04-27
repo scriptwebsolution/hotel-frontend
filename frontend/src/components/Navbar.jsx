@@ -1,7 +1,50 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
+
+function getInitials(name = "") {
+  return (
+    name
+      .split(" ")
+      .map((p) => p[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "U"
+  );
+}
+
+const ROLE_LABEL = {
+  admin: "Administrator",
+  staff: "Staff",
+  guest: "Guest",
+};
 
 export default function Navbar({ onToggleSidebar }) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    setMenuOpen(false);
+    logout();
+    navigate("/login", { replace: true });
+  };
+
+  const displayName = user?.name || "Account";
+  const displayRole = ROLE_LABEL[user?.role] || "Member";
+  const displayEmail = user?.email || "";
 
   return (
     <header className="sticky top-0 z-20 border-b border-ink-100 bg-white/80 backdrop-blur">
@@ -71,21 +114,29 @@ export default function Navbar({ onToggleSidebar }) {
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-brand-500" />
           </button>
 
-          <div className="relative">
+          <div className="relative" ref={menuRef}>
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
               className="flex items-center gap-3 rounded-xl border border-ink-200 bg-white py-1.5 pl-1.5 pr-3 text-left transition hover:bg-ink-50"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-100 text-sm font-semibold text-brand-700">
-                AM
-              </span>
+              {user?.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={displayName}
+                  className="h-8 w-8 rounded-lg object-cover"
+                />
+              ) : (
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-100 text-sm font-semibold text-brand-700">
+                  {getInitials(displayName)}
+                </span>
+              )}
               <span className="hidden leading-tight sm:block">
-                <span className="block text-sm font-medium text-ink-900">
-                  Aarav Mehta
+                <span className="block max-w-[160px] truncate text-sm font-medium text-ink-900">
+                  {displayName}
                 </span>
                 <span className="block text-[11px] text-ink-500">
-                  Front Desk Manager
+                  {displayRole}
                 </span>
               </span>
               <svg
@@ -103,10 +154,16 @@ export default function Navbar({ onToggleSidebar }) {
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-ink-100 bg-white shadow-soft">
+              <div className="absolute right-0 mt-2 w-60 overflow-hidden rounded-xl border border-ink-100 bg-white shadow-soft">
                 <div className="border-b border-ink-100 px-4 py-3">
-                  <p className="text-sm font-medium text-ink-900">Aarav Mehta</p>
-                  <p className="text-xs text-ink-500">aarav@stayly.app</p>
+                  <p className="truncate text-sm font-medium text-ink-900">
+                    {displayName}
+                  </p>
+                  {displayEmail && (
+                    <p className="truncate text-xs text-ink-500">
+                      {displayEmail}
+                    </p>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -122,6 +179,7 @@ export default function Navbar({ onToggleSidebar }) {
                 </button>
                 <button
                   type="button"
+                  onClick={handleLogout}
                   className="flex w-full items-center gap-2 border-t border-ink-100 px-4 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50"
                 >
                   <svg

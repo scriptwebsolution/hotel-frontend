@@ -146,7 +146,7 @@ export default function Sidebar({ open, onClose }) {
         <div className="mt-6 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 p-5 text-white">
           <p className="text-sm font-semibold">Need help?</p>
           <p className="mt-1 text-xs text-brand-100">
-            Browse our docs or contact support to get the most out of Stayly.
+            Browse our docs or contact support to get the most out of Axiora.
           </p>
           <button
             type="button"

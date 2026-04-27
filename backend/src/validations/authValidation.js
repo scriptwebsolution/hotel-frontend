@@ -16,4 +16,10 @@ const login = {
   }),
 };
 
-module.exports = { register, login };
+const googleAuth = {
+  body: Joi.object({
+    credential: Joi.string().required(),
+  }),
+};
+
+module.exports = { register, login, googleAuth };

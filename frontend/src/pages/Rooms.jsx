@@ -1,15 +1,36 @@
-import { useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import RoomCard from "../components/RoomCard.jsx";
 import { rooms as allRooms } from "../utils/mockData.js";
+import { fetchRooms } from "../services/roomService.js";
 
 const filters = ["All", "Available", "Occupied", "Maintenance"];
 
 export default function Rooms() {
   const [active, setActive] = useState("All");
   const [query, setQuery] = useState("");
+  const [backendRooms, setBackendRooms] = useState(allRooms);
+  const [loadingRooms, setLoadingRooms] = useState(true);
+  const [roomsError, setRoomsError] = useState("");
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoadingRooms(true);
+        setRoomsError("");
+        const data = await fetchRooms();
+        setBackendRooms(data);
+      } catch (err) {
+        setRoomsError(err.message || "Unable to reach backend.");
+      } finally {
+        setLoadingRooms(false);
+      }
+    };
+
+    load();
+  }, []);
 
   const visible = useMemo(() => {
-    return allRooms.filter((r) => {
+    return backendRooms.filter((r) => {
       const matchStatus = active === "All" || r.status === active;
       const q = query.trim().toLowerCase();
       const matchQuery =
@@ -19,16 +40,16 @@ export default function Rooms() {
         r.id.toLowerCase().includes(q);
       return matchStatus && matchQuery;
     });
-  }, [active, query]);
+  }, [active, query, backendRooms]);
 
   const counts = useMemo(
     () => ({
-      All: allRooms.length,
-      Available: allRooms.filter((r) => r.status === "Available").length,
-      Occupied: allRooms.filter((r) => r.status === "Occupied").length,
-      Maintenance: allRooms.filter((r) => r.status === "Maintenance").length,
+      All: backendRooms.length,
+      Available: backendRooms.filter((r) => r.status === "Available").length,
+      Occupied: backendRooms.filter((r) => r.status === "Occupied").length,
+      Maintenance: backendRooms.filter((r) => r.status === "Maintenance").length,
     }),
-    []
+    [backendRooms]
   );
 
   return (
@@ -46,6 +67,12 @@ export default function Rooms() {
         </div>
       </div>
 
+      {roomsError && (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Backend room API not reachable. Showing fallback demo data.
+        </section>
+      )}
+
       <section className="card p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-2">
@@ -61,9 +88,7 @@ export default function Rooms() {
                 }`}
               >
                 {f}
-                <span className="ml-2 text-xs text-ink-400">
-                  {counts[f]}
-                </span>
+                <span className="ml-2 text-xs text-ink-400">{counts[f]}</span>
               </button>
             ))}
           </div>
@@ -92,7 +117,11 @@ export default function Rooms() {
         </div>
       </section>
 
-      {visible.length === 0 ? (
+      {loadingRooms ? (
+        <div className="card flex items-center justify-center px-6 py-16 text-sm text-ink-500">
+          Loading rooms from backend...
+        </div>
+      ) : visible.length === 0 ? (
         <div className="card flex flex-col items-center justify-center px-6 py-16 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-ink-100 text-ink-500">
             <svg

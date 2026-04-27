@@ -24,6 +24,10 @@ const env = {
     saltRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS || "10", 10),
   },
 
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID || "",
+  },
+
   cors: {
     origin: process.env.CORS_ORIGIN || "*",
   },
