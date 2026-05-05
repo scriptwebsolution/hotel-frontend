@@ -1,8 +1,10 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import StatCard from "../components/StatCard.jsx";
 import RoomCard from "../components/RoomCard.jsx";
 import { bookings, rooms as mockRooms, stats } from "../utils/mockData.js";
 import { fetchRooms } from "../services/roomService.js";
+import { useAuth } from "../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 const statusStyles = {
   Confirmed: "bg-brand-50 text-brand-700",
@@ -75,6 +77,8 @@ const iconRevenue = (
 );
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [liveRooms, setLiveRooms] = useState(mockRooms);
   const [loadingRooms, setLoadingRooms] = useState(true);
   const [roomsError, setRoomsError] = useState("");
@@ -110,14 +114,14 @@ export default function Dashboard() {
     <div className="space-y-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm text-ink-500">Welcome back, Aarav</p>
+          <p className="text-sm text-ink-500">Welcome back, {user?.name?.split(' ')[0] || "User"}</p>
           <h1 className="mt-1 text-2xl font-semibold text-ink-900 sm:text-3xl">
             Hotel overview
           </h1>
         </div>
         <div className="flex items-center gap-2">
           <button className="btn-ghost">Export</button>
-          <button className="btn-primary">+ New booking</button>
+          <button onClick={() => navigate('/bookings')} className="btn-primary">+ New booking</button>
         </div>
       </div>
 

@@ -147,6 +147,8 @@ export default function Booking() {
                   value={form.checkIn}
                   onChange={handleChange}
                   className="input"
+                  min="2024-01-01"
+                  max="2099-12-31"
                   required
                 />
               </div>
@@ -161,6 +163,8 @@ export default function Booking() {
                   value={form.checkOut}
                   onChange={handleChange}
                   className="input"
+                  min="2024-01-01"
+                  max="2099-12-31"
                   required
                 />
               </div>

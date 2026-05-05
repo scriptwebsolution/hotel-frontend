@@ -3,6 +3,7 @@ import { GoogleLogin } from "@react-oauth/google";
 export default function GoogleAuthButton({ onSuccess, onError, label }) {
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
+
   if (!clientId) {
     return (
       <button
