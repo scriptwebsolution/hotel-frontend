@@ -7,12 +7,18 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const roomRoutes = require("./routes/roomRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const customerRoutes = require("./routes/customerRoutes");
+const roomFacilityRoutes = require("./routes/roomFacilityRoutes");
 const { notFoundHandler, errorHandler } = require("./middlewares/errorMiddleware");
 
 const app = express();
 
 app.disable("x-powered-by");
-app.use(cors({ origin: env.cors.origin }));
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -28,6 +34,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/room-facilities", roomFacilityRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

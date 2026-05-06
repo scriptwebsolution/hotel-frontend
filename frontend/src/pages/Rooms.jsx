@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import RoomCard from "../components/RoomCard.jsx";
 import { rooms as allRooms } from "../utils/mockData.js";
 import { fetchRooms } from "../services/roomService.js";
@@ -35,9 +35,9 @@ export default function Rooms() {
       const q = query.trim().toLowerCase();
       const matchQuery =
         !q ||
-        r.name.toLowerCase().includes(q) ||
-        r.type.toLowerCase().includes(q) ||
-        r.id.toLowerCase().includes(q);
+        r.name?.toLowerCase().includes(q) ||
+        r.type?.toLowerCase().includes(q) ||
+        String(r.id).toLowerCase().includes(q);
       return matchStatus && matchQuery;
     });
   }, [active, query, backendRooms]);

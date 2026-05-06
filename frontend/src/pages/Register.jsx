@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout.jsx";
-import GoogleAuthButton from "../components/GoogleAuthButton.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const initialForm = {
@@ -12,7 +11,7 @@ const initialForm = {
 };
 
 export default function Register() {
-  const { register, loginWithGoogle } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState(initialForm);
@@ -61,15 +60,7 @@ export default function Register() {
     }
   };
 
-  const handleGoogle = async (credential) => {
-    setError("");
-    try {
-      await loginWithGoogle(credential);
-      navigate("/dashboard", { replace: true });
-    } catch (err) {
-      setError(err.message || "Google sign-up failed");
-    }
-  };
+
 
   return (
     <AuthLayout
@@ -173,17 +164,7 @@ export default function Register() {
         </button>
       </form>
 
-      <div className="my-6 flex items-center gap-3 text-xs text-ink-400">
-        <span className="h-px flex-1 bg-ink-100" />
-        OR
-        <span className="h-px flex-1 bg-ink-100" />
-      </div>
 
-      <GoogleAuthButton
-        onSuccess={handleGoogle}
-        onError={(err) => setError(err.message)}
-        label="Sign up with Google"
-      />
     </AuthLayout>
   );
 }

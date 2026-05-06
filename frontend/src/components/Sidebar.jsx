@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Logo from "./Logo.jsx";
 
 const navItems = [
@@ -63,8 +64,7 @@ const navItems = [
     ),
   },
   {
-    to: "/guests",
-    label: "Guests",
+    label: "Customer",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -76,14 +76,58 @@ const navItems = [
         strokeLinejoin="round"
         className="h-5 w-5"
       >
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21c0-4 4-7 8-7s8 3 8 7" />
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
       </svg>
     ),
+    children: [
+      { to: "/customer/customer-list", label: "Customer List" },
+      { to: "/customer/guest-list", label: "Guest List" },
+    ]
+  },
+  {
+    label: "Room Facilities",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-5 w-5"
+      >
+        <rect x="3" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="14" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" />
+      </svg>
+    ),
+    children: [
+      { to: "/room-facilities/facility-list", label: "Facility List" },
+      { to: "/room-facilities/facility-details-list", label: "Facility Details List" },
+      { to: "/room-facilities/room-size-list", label: "Room Size List" },
+    ]
   },
 ];
 
 export default function Sidebar({ open, onClose }) {
+  const location = useLocation();
+  const [expandedMenus, setExpandedMenus] = useState({});
+
+  useEffect(() => {
+    // Auto-expand menu if a child is active
+    navItems.forEach((item) => {
+      if (item.children && item.children.some(child => location.pathname.includes(child.to))) {
+        setExpandedMenus(prev => ({ ...prev, [item.label]: true }));
+      }
+    });
+  }, [location.pathname]);
+
+  const toggleMenu = (label) => {
+    setExpandedMenus(prev => ({ ...prev, [label]: !prev[label] }));
+  };
   return (
     <>
       {open && (
@@ -125,21 +169,68 @@ export default function Sidebar({ open, onClose }) {
 
         <nav className="mt-8 flex-1 space-y-1">
           {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  isActive
-                    ? "bg-brand-50 text-brand-700"
-                    : "text-ink-600 hover:bg-ink-50 hover:text-ink-900"
-                }`
-              }
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </NavLink>
+            item.children ? (
+              <div key={item.label} className="flex flex-col">
+                <button
+                  onClick={() => toggleMenu(item.label)}
+                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                    expandedMenus[item.label] || item.children.some(child => location.pathname.includes(child.to))
+                      ? "bg-[#28a745] text-white"
+                      : "text-ink-600 hover:bg-ink-50 hover:text-ink-900"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`h-4 w-4 transition-transform ${expandedMenus[item.label] ? "rotate-180" : ""}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {expandedMenus[item.label] && (
+                  <div className="ml-8 mt-1 space-y-1">
+                    {item.children.map(child => (
+                      <NavLink
+                        key={child.to}
+                        to={child.to}
+                        onClick={onClose}
+                        className={({ isActive }) =>
+                          `block rounded-lg px-3 py-2 text-sm font-medium transition ${
+                            isActive
+                              ? "text-[#28a745]"
+                              : "text-ink-500 hover:text-ink-900"
+                          }`
+                        }
+                      >
+                        {child.label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                    isActive
+                      ? "bg-brand-50 text-brand-700"
+                      : "text-ink-600 hover:bg-ink-50 hover:text-ink-900"
+                  }`
+                }
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </NavLink>
+            )
           ))}
         </nav>
 

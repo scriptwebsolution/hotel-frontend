@@ -7,6 +7,11 @@ import Rooms from "./pages/Rooms.jsx";
 import Guests from "./pages/Guests.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import CustomerList from "./pages/Customer/CustomerList.jsx";
+import GuestList from "./pages/Customer/GuestList.jsx";
+import FacilityList from "./pages/RoomFacilities/FacilityList.jsx";
+import FacilityDetailsList from "./pages/RoomFacilities/FacilityDetailsList.jsx";
+import RoomSizeList from "./pages/RoomFacilities/RoomSizeList.jsx";
 
 export default function App() {
   return (
@@ -26,6 +31,11 @@ export default function App() {
         <Route path="/bookings" element={<Booking />} />
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/guests" element={<Guests />} />
+        <Route path="/customer/customer-list" element={<CustomerList />} />
+        <Route path="/customer/guest-list" element={<GuestList />} />
+        <Route path="/room-facilities/facility-list" element={<FacilityList />} />
+        <Route path="/room-facilities/facility-details-list" element={<FacilityDetailsList />} />
+        <Route path="/room-facilities/room-size-list" element={<RoomSizeList />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -8,7 +8,6 @@ import {
 } from "react";
 import {
   fetchMe,
-  googleLoginRequest,
   loginRequest,
   registerRequest,
 } from "../services/authService.js";
@@ -65,14 +64,7 @@ export function AuthProvider({ children }) {
     [persistAuth]
   );
 
-  const loginWithGoogle = useCallback(
-    async (credential) => {
-      const result = await googleLoginRequest(credential);
-      persistAuth(result);
-      return result.user;
-    },
-    [persistAuth]
-  );
+
 
   const logout = useCallback(() => {
     clearToken();
@@ -88,11 +80,10 @@ export function AuthProvider({ children }) {
       isLoading: status === "loading",
       login,
       register,
-      loginWithGoogle,
       logout,
       refresh: bootstrap,
     }),
-    [user, status, login, register, loginWithGoogle, logout, bootstrap]
+    [user, status, login, register, logout, bootstrap]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
