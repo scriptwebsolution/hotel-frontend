@@ -44,6 +44,15 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, data: booking });
 });
 
+const checkAvailability = asyncHandler(async (req, res) => {
+  const result = await bookingService.checkAvailability(
+    req.query.roomId,
+    req.query.checkIn,
+    req.query.checkOut
+  );
+  res.status(200).json({ success: true, ...result });
+});
+
 module.exports = {
   createBooking,
   getMyBookings,
@@ -51,4 +60,5 @@ module.exports = {
   getBooking,
   cancelBooking,
   updateBookingStatus,
+  checkAvailability,
 };

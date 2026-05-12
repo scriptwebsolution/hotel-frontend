@@ -9,7 +9,7 @@ export default function Login() {
   const location = useLocation();
   const redirectTo = location.state?.from?.pathname || "/dashboard";
 
-  const [form, setForm] = useState({ email: "", password: "", captcha: "" });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -24,14 +24,8 @@ export default function Login() {
     setError("");
     
     // Validations
-    if (!form.email || !form.password || !form.captcha) {
-      setError("Please fill all required fields, including the captcha.");
-      return;
-    }
-    
-    // Mock captcha validation
-    if (form.captcha.toLowerCase().replace(/\s/g, "") !== "phtd") {
-      setError("Invalid Captcha. Please enter the correct text.");
+    if (!form.email || !form.password) {
+      setError("Please fill all required fields.");
       return;
     }
 
@@ -46,24 +40,7 @@ export default function Login() {
     }
   };
 
-  // Mock Captcha component
-  const MockCaptcha = () => (
-    <div className="relative h-14 w-full bg-white border border-gray-200 rounded overflow-hidden select-none mb-3">
-      <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-        <path d="M-10,20 Q40,60 100,10 T200,40" stroke="#e5e7eb" strokeWidth="1" fill="none" />
-        <path d="M0,40 Q60,10 120,50 T300,20" stroke="#e5e7eb" strokeWidth="1" fill="none" />
-        <path d="M20,10 Q80,50 150,10 T300,40" stroke="#f3f4f6" strokeWidth="2" fill="none" />
-        <path d="M-20,30 Q50,-10 130,60 T320,30" stroke="#e5e7eb" strokeWidth="1" fill="none" />
-        <path d="M10,50 Q70,20 140,50 T280,10" stroke="#f3f4f6" strokeWidth="2" fill="none" />
-        <path d="M0,0 L300,60 M0,60 L300,0" stroke="#e5e7eb" strokeWidth="0.5" fill="none" />
-        <path d="M50,0 L100,60 M150,0 L200,60" stroke="#e5e7eb" strokeWidth="0.5" fill="none" />
-        <text x="30%" y="60%" fill="#22c55e" fontSize="20" fontFamily="serif" transform="rotate(-5 80 30)">p</text>
-        <text x="45%" y="45%" fill="#16a34a" fontSize="22" fontFamily="serif" transform="rotate(10 130 20)">h</text>
-        <text x="60%" y="55%" fill="#15803d" fontSize="18" fontFamily="serif" transform="rotate(-15 170 30)">t</text>
-        <text x="75%" y="40%" fill="#166534" fontSize="24" fontFamily="serif" transform="rotate(5 210 20)">d</text>
-      </svg>
-    </div>
-  );
+
 
   return (
     <AuthLayout
@@ -133,19 +110,7 @@ export default function Login() {
           </div>
         </div>
 
-        <div>
-          <MockCaptcha />
-          <input
-            id="captcha"
-            name="captcha"
-            type="text"
-            required
-            value={form.captcha}
-            onChange={handleChange}
-            placeholder="Captcha"
-            className="input w-full"
-          />
-        </div>
+
 
         <div className="flex justify-end mt-2">
           <button
@@ -162,34 +127,7 @@ export default function Login() {
         </button>
       </form>
 
-      <div className="mt-8 overflow-hidden rounded border border-gray-200 bg-white">
-        <table className="w-full text-left text-[13px] text-gray-700">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="px-3 py-2.5 font-semibold">Email</th>
-              <th className="px-3 py-2.5 font-semibold border-l border-gray-200">Password</th>
-              <th className="px-3 py-2.5 font-semibold border-l border-gray-200">Role</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            <tr>
-              <td className="px-3 py-2.5">tester1@gmail.com</td>
-              <td className="px-3 py-2.5 border-l border-gray-200">tester1@123</td>
-              <td className="px-3 py-2.5 border-l border-gray-200">Super Admin</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2.5">manager1@gmail.com</td>
-              <td className="px-3 py-2.5 border-l border-gray-200">manager1@123</td>
-              <td className="px-3 py-2.5 border-l border-gray-200">Manager</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2.5">cashier1@gmail.com</td>
-              <td className="px-3 py-2.5 border-l border-gray-200">cashier1@123</td>
-              <td className="px-3 py-2.5 border-l border-gray-200">Cashier</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+
     </AuthLayout>
   );
 }

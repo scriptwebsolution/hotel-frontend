@@ -9,10 +9,22 @@ const getById = async (id) => {
   return room;
 };
 
-const create = (payload) => roomModel.create(payload);
+const create = async (payload) => {
+  const existing = await roomModel.findByRoomNumber(payload.roomNumber);
+  if (existing) throw ApiError.badRequest("Room number already exists");
+  return roomModel.create(payload);
+};
 
 const update = async (id, payload) => {
   await getById(id);
+  
+  if (payload.roomNumber) {
+    const existing = await roomModel.findByRoomNumber(payload.roomNumber);
+    if (existing && existing.id !== id) {
+      throw ApiError.badRequest("Room number already exists");
+    }
+  }
+  
   return roomModel.update(id, payload);
 };
 

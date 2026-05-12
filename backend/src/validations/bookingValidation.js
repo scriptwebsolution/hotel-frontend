@@ -19,7 +19,7 @@ const updateStatus = {
   params: idParam.params,
   body: Joi.object({
     status: Joi.string()
-      .valid("pending", "confirmed", "cancelled", "completed")
+      .valid("pending", "confirmed", "checkedin", "checkedout", "cancelled", "noshow")
       .required(),
   }),
 };
@@ -28,8 +28,16 @@ const list = {
   query: Joi.object({
     limit: Joi.number().integer().min(1).max(200).default(50),
     offset: Joi.number().integer().min(0).default(0),
-    status: Joi.string().valid("pending", "confirmed", "cancelled", "completed"),
+    status: Joi.string().valid("pending", "confirmed", "checkedin", "checkedout", "cancelled", "noshow"),
   }),
 };
 
-module.exports = { idParam, create, updateStatus, list };
+const checkAvailability = {
+  query: Joi.object({
+    roomId: Joi.string().uuid().required(),
+    checkIn: Joi.date().iso().required(),
+    checkOut: Joi.date().iso().greater(Joi.ref("checkIn")).required(),
+  }),
+};
+
+module.exports = { idParam, create, updateStatus, list, checkAvailability };

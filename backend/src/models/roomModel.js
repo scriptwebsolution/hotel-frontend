@@ -21,6 +21,14 @@ const findById = async (id) => {
   return mapRoom(rows[0]) || null;
 };
 
+const findByRoomNumber = async (roomNumber) => {
+  const [rows] = await pool.query(
+    `SELECT ${COLUMNS} FROM rooms WHERE room_number = ?`,
+    [roomNumber]
+  );
+  return mapRoom(rows[0]) || null;
+};
+
 const list = async ({ activeOnly = true, limit = 100, offset = 0 } = {}) => {
   const where = activeOnly ? "WHERE is_active = 1" : "";
   const [rows] = await pool.query(
@@ -106,6 +114,7 @@ const findAvailable = async ({ checkIn, checkOut, capacity = 1 }) => {
 
 module.exports = {
   findById,
+  findByRoomNumber,
   list,
   create,
   update,

@@ -18,8 +18,14 @@ router.get(
   bookingController.getAllBookings
 );
 
+router.get(
+  "/availability/check",
+  validate(bookingValidation.checkAvailability),
+  bookingController.checkAvailability
+);
+
 router.get("/:id", validate(bookingValidation.idParam), bookingController.getBooking);
-router.post("/:id/cancel", validate(bookingValidation.idParam), bookingController.cancelBooking);
+router.patch("/:id/cancel", validate(bookingValidation.idParam), bookingController.cancelBooking);
 
 router.patch(
   "/:id/status",

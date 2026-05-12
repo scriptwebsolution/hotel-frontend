@@ -73,7 +73,7 @@ const createWithOverlapGuard = async ({
     const [conflicts] = await conn.query(
       `SELECT id FROM bookings
        WHERE room_id = ?
-         AND status IN ('pending', 'confirmed')
+         AND status IN ('pending', 'confirmed', 'checkedin')
          AND check_in < ?
          AND check_out > ?
        FOR UPDATE`,
@@ -123,6 +123,18 @@ const remove = async (id) => {
   return result.affectedRows > 0;
 };
 
+const checkAvailability = async (roomId, checkIn, checkOut) => {
+  const [conflicts] = await pool.query(
+    `SELECT id FROM bookings
+     WHERE room_id = ?
+       AND status IN ('pending', 'confirmed', 'checkedin')
+       AND check_in < ?
+       AND check_out > ?`,
+    [roomId, checkOut, checkIn]
+  );
+  return conflicts.length === 0;
+};
+
 module.exports = {
   findById,
   listForUser,
@@ -130,4 +142,5 @@ module.exports = {
   createWithOverlapGuard,
   updateStatus,
   remove,
+  checkAvailability,
 };

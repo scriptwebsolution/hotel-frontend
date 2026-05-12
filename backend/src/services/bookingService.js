@@ -86,8 +86,8 @@ const cancel = async (id, currentUser) => {
   if (booking.status === "cancelled") {
     return booking;
   }
-  if (booking.status === "completed") {
-    throw ApiError.badRequest("Completed bookings cannot be cancelled");
+  if (["completed", "checkedout", "noshow"].includes(booking.status)) {
+    throw ApiError.badRequest(`Cannot cancel a booking with status: ${booking.status}`);
   }
   return bookingModel.updateStatus(id, "cancelled");
 };
@@ -98,6 +98,28 @@ const updateStatus = async (id, status) => {
   return updated;
 };
 
+const checkAvailability = async (roomId, checkIn, checkOut) => {
+  const ci = toDateOnly(checkIn);
+  const co = toDateOnly(checkOut);
+  ensureValidDateRange(ci, co);
+
+  const room = await roomModel.findById(roomId);
+  if (!room) throw ApiError.notFound("Room not found");
+  if (!room.is_active) throw ApiError.badRequest("Room is not available for booking");
+
+  const isAvailable = await bookingModel.checkAvailability(
+    roomId,
+    ci.toISOString().slice(0, 10),
+    co.toISOString().slice(0, 10)
+  );
+
+  if (!isAvailable) {
+    return { available: false, message: "Room is already booked for selected dates" };
+  }
+
+  return { available: true };
+};
+
 module.exports = {
   createBooking,
   getById,
@@ -105,4 +127,5 @@ module.exports = {
   listAll,
   cancel,
   updateStatus,
+  checkAvailability,
 };

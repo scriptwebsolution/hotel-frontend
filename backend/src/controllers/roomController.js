@@ -1,8 +1,13 @@
 const asyncHandler = require("../utils/asyncHandler");
 const roomService = require("../services/roomService");
 
-const list = asyncHandler(async (_req, res) => {
-  const rooms = await roomService.getAll();
+const list = asyncHandler(async (req, res) => {
+  const options = {
+    activeOnly: req.query.activeOnly !== "false",
+    limit: parseInt(req.query.limit, 10) || 100,
+    offset: parseInt(req.query.offset, 10) || 0,
+  };
+  const rooms = await roomService.getAll(options);
   res.status(200).json({ success: true, data: rooms });
 });
 

@@ -35,6 +35,7 @@ api.interceptors.response.use(
     const status = error?.response?.status;
     if (status === 401) {
       clearToken();
+      window.location.href = "/login";
     }
 
     // 5. Proper error handling
